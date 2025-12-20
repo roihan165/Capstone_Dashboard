@@ -1,0 +1,125 @@
+<!-- # Flowcamp.id — Executive Dashboard Template -->
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Flowcamp.id - Executive Dashboard</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo">F</div>
+      </div>
+      <nav class="menu">
+        <a class="menu-item active"><span class="icon">▦</span><span>Dashboard Utama</span></a>
+        <a class="menu-item"><span class="icon">👥</span><span>Data Peserta</span></a>
+        <a class="menu-item"><span class="icon">💼</span><span>Keuangan</span></a>
+        <a class="menu-item"><span class="icon">📣</span><span>Marketing (BI)</span></a>
+        <a class="menu-item"><span class="icon">🎧</span><span>Layanan (ITIL 4)</span></a>
+      </nav>
+      <div class="logout">⟲ Logout</div>
+    </aside>
+
+    <main class="main">
+      <header class="header">
+        <h1>Overview Operasional & Bisnis</h1>
+        <div class="profile">
+          <div class="avatar">RH</div>
+          <div class="meta"><div class="name">Reza Hafiz</div><div class="role">IT Operation Manager</div></div>
+        </div>
+      </header>
+
+      <section class="kpis">
+        <div class="kpi card large">
+          <div class="kpi-value">Rp 125jt</div>
+          <div class="kpi-label">Total Pendapatan<br><small>(Bulan Ini)</small></div>
+        </div>
+
+        <div class="kpi card medium">
+          <div class="kpi-value">482</div>
+          <div class="kpi-label">Total Peserta Aktif</div>
+        </div>
+
+        <div class="kpi card medium">
+          <div class="kpi-value">98.5%</div>
+          <div class="kpi-label">Tingkat Pemenuhan SLA<br><small>(ITIL 4 - Efisiensi)</small></div>
+        </div>
+
+        <div class="kpi card small">
+          <div class="kpi-value">4.8/5</div>
+          <div class="kpi-label">Kepuasan Pelanggan (CSAT)</div>
+        </div>
+      </section>
+
+      <section class="content">
+        <div class="card chart-card">
+          <div class="card-header">
+            <h3>Alur Pemasukan (Revenue Trend)</h3>
+            <button id="details" class="btn">Lihat Detail ➜</button>
+          </div>
+          <canvas id="revenueChart"></canvas>
+        </div>
+
+        <div class="card transactions">
+          <h3>Transaksi Terbaru</h3>
+          <table class="table">
+            <thead><tr><th>Tanggal</th><th>Judul</th><th>Harga</th><th>Status</th></tr></thead>
+            <tbody id="tx-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <footer class="footer">&copy; Flowcamp.id</footer>
+    </main>
+  </div>
+
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script>
+    const socket = io(); // jika beda origin: io('https://your-domain')
+  socket.on('connect', ()=> console.log('socket connected'));
+  socket.on('sheet_update', async (info) => {
+    console.log('sheet_update', info);
+    // fetch /data terbaru dan render ulang
+    const res = await fetch('/data');
+    const rows = await res.json();
+    renderTable(rows);
+    renderChart(rows);
+  });
+
+async function fetchData(){
+  const res = await fetch('/data');
+  return res.json();
+}
+
+function renderTable(rows){
+  const body = document.getElementById('tx-body'); body.innerHTML='';
+  rows.slice(0,8).forEach(r=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${r.date}</td><td>${r.title}</td><td>Rp ${r.price.toLocaleString()}</td><td>${r.status}</td>`;
+    body.appendChild(tr);
+  });
+}
+
+let chart=null;
+function renderChart(rows){
+  const ctx = document.getElementById('revenueChart').getContext('2d');
+  const map = new Map();
+  rows.forEach(r=> map.set(r.date, (map.get(r.date)||0)+r.price));
+  const labels = Array.from(map.keys()).sort();
+  const data = labels.map(l=>map.get(l));
+  if(chart) chart.destroy();
+  chart = new Chart(ctx, {type:'line',data:{labels,datasets:[{label:'Revenue',data}]},options:{responsive:true}});
+}
+
+window.addEventListener('load', async ()=>{
+  const data = await fetchData();
+  renderTable(data);
+  renderChart(data);
+});
+</script>
+</body>
+</html>

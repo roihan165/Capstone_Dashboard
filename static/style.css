@@ -1,0 +1,38 @@
+:root{--bg:#eef3f6;--sidebar:#151a23;--card:#fff;--muted:#6b7280;--accent:#0ea5a4}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,Arial;background:var(--bg);color:#0b1220}
+.app{display:flex;height:100vh}
+.sidebar{width:220px;background:#0f1720;color:#fff;padding:28px 16px;display:flex;flex-direction:column;align-items:flex-start}
+.brand{width:100%;display:flex;align-items:center;justify-content:center;margin-bottom:18px}
+.logo{background:#ff6a00;width:56px;height:56px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:28px}
+.menu{width:100%;margin-top:8px}
+.menu-item{display:flex;gap:12px;align-items:center;padding:12px;border-radius:12px;color:#cbd5e1;text-decoration:none;cursor:pointer;margin-bottom:8px}
+.menu-item.active{background:#e6f6f6;color:#065f5a}
+.menu-item .icon{width:26px}
+.logout{margin-top:auto;color:#ff7b7b;cursor:pointer;padding:8px}
+
+.main{flex:1;padding:24px 36px;overflow:auto}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.header h1{background:#fff;padding:18px 24px;border-radius:12px;box-shadow:0 8px 20px rgba(16,24,40,0.06);margin:0;font-size:22px}
+.profile{display:flex;align-items:center;gap:12px}
+.avatar{width:56px;height:56px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-weight:700}
+.meta .name{font-weight:700}
+.meta .role{font-size:12px;color:var(--muted)}
+
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin:18px 0}
+.card{background:var(--card);padding:18px;border-radius:12px;box-shadow:0 8px 20px rgba(16,24,40,0.06)}
+.kpi.value{font-size:20px}
+.kpi.large{grid-column: span 2}
+.kpi .kpi-value{font-size:28px;font-weight:700}
+.kpi .kpi-label{color:var(--muted);margin-top:8px}
+.kpi.small .kpi-value{font-size:24px}
+
+.content{display:grid;grid-template-columns:2fr 1fr;gap:18px}
+.chart-card .card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.btn{background:#0ea5a4;color:white;padding:8px 14px;border-radius:8px;border:none;cursor:pointer}
+.table{width:100%;border-collapse:collapse}
+.table th{background:#f8fafc;padding:10px;text-align:left;border-bottom:1px solid #eef2f6}
+.table td{padding:10px;border-bottom:1px solid #f1f5f9}
+.footer{margin-top:20px;color:var(--muted);font-size:13px}
+
+@media(max-width:1000px){.kpis{grid-template-columns:repeat(2,1fr)}.content{grid-template-columns:1fr}}

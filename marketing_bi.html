@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marketing BI & Courses - Flowcamp.id</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="container">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="image.png" alt="Flowcamp.id Logo" class="company-logo">
+            </div>
+            <ul class="menu">
+                <li><a href="dashboard.html"><i class="fas fa-th-large"></i> Dashboard Utama</a></li>
+                <li><a href="data_peserta.html"><i class="fas fa-user-graduate"></i> Data Peserta</a></li>
+                <li><a href="#"><i class="fas fa-wallet"></i> Keuangan</a></li>
+                <!-- ACTIVE MENU -->
+                <li class="active"><a href="marketing_bi.html"><i class="fas fa-bullhorn"></i> Marketing (BI)</a></li>
+                <li><a href="#"><i class="fas fa-headset"></i> Layanan (ITIL 4)</a></li>
+            </ul>
+            <div class="logout">
+                <a href="#"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            <header>
+                <h1>Analisis Produk & Pemasaran</h1>
+                <div class="user-wrapper">
+                    <img src="image_ef7fc5.png" alt="Admin Profile" class="admin-photo">
+                    <div>
+                        <h4>Reza Hafiz</h4>
+                        <small>IT Operation Manager</small>
+                    </div>
+                </div>
+            </header>
+
+            <!-- SECTION GRID COURSES -->
+            <div class="courses-section">
+                <h2 style="color: var(--text-dark); margin-bottom: 1rem;">Katalog Bootcamp & Performa</h2>
+                <div class="courses-grid" id="coursesContainer">
+                    <!-- Course Cards akan di-generate oleh JavaScript -->
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- MODAL DETAIL POPUP -->
+    <div class="modal-overlay" id="courseModal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            
+            <div class="modal-header">
+                <div class="modal-icon">
+                    <i id="modalIcon" class="fas fa-code"></i>
+                </div>
+                <div>
+                    <h2 id="modalTitle">Judul Course</h2>
+                    <div class="modal-price-tag" id="modalPrice">Rp 0</div>
+                </div>
+            </div>
+
+            <div class="modal-body">
+                <div class="detail-grid">
+                    <div class="detail-box">
+                        <h5 id="modalParticipants">0</h5>
+                        <span>Total Peserta Join</span>
+                    </div>
+                    <div class="detail-box">
+                        <h5 id="modalRevenue">Rp 0</h5>
+                        <span>Estimasi Pendapatan</span>
+                    </div>
+                </div>
+
+                <h4>Deskripsi Materi & Silabus:</h4>
+                <p id="modalDesc">Deskripsi lengkap materi akan muncul di sini.</p>
+
+                <h4>Analisis Marketing (BI Insight):</h4>
+                <p id="modalInsight" style="color: var(--accent-color); font-style: italic;">Insight performa course...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT LOGIC -->
+    <script>
+        // Data Dummy Courses
+        const coursesData = [
+            {
+                id: 1,
+                title: "Fullstack Javascript Bootcamp",
+                icon: "fa-js-square",
+                price: "Rp 2.500.000",
+                participants: 120,
+                desc: "Belajar pengembangan web modern dari hulu ke hilir menggunakan ekosistem JavaScript. Materi mencakup dasar JS, NodeJS, ReactJS, Express, hingga deployment ke Cloud Server. Cocok untuk pemula hingga tingkat menengah.",
+                insight: "🔥 Course paling diminati bulan ini. Konversi tertinggi berasal dari Instagram Ads.",
+                revenue: "Rp 300.000.000"
+            },
+            {
+                id: 2,
+                title: "Python Data Science Masterclass",
+                icon: "fa-python",
+                price: "Rp 3.000.000",
+                participants: 90,
+                desc: "Kuasai analisis data dan machine learning dengan Python. Anda akan mempelajari Pandas, NumPy, Matplotlib, Scikit-Learn, hingga Deep Learning dasar. Termasuk 5 proyek portofolio nyata.",
+                insight: "📈 Tren pendaftaran meningkat 20% dibanding bulan lalu. Populer di kalangan mahasiswa.",
+                revenue: "Rp 270.000.000"
+            },
+            {
+                id: 3,
+                title: "Golang Backend Engineering",
+                icon: "fa-google",
+                price: "Rp 2.800.000",
+                participants: 75,
+                desc: "Bangun sistem backend yang scalable dan performa tinggi dengan Go-lang. Materi meliputi Syntax Go, Goroutines, RESTful API, Microservices Architecture, dan gRPC.",
+                insight: "💼 Peminat mayoritas berasal dari profesional yang ingin switch career ke Backend.",
+                revenue: "Rp 210.000.000"
+            },
+            {
+                id: 4,
+                title: "Flutter Mobile Development",
+                icon: "fa-mobile-alt",
+                price: "Rp 2.500.000",
+                participants: 60,
+                desc: "Buat aplikasi Android dan iOS sekaligus dengan satu codebase menggunakan Flutter dan Dart. Pelajari Widget, State Management (BLoC/Provider), dan integrasi API.",
+                insight: "📱 Stabil. Banyak diminati oleh freelancer mobile developer.",
+                revenue: "Rp 150.000.000"
+            },
+            {
+                id: 5,
+                title: "DevOps & Cloud Infrastructure",
+                icon: "fa-server",
+                price: "Rp 3.500.000",
+                participants: 40,
+                desc: "Pelajari cara mengelola infrastruktur modern. Materi mencakup Linux, Docker, Kubernetes, CI/CD Pipeline (Jenkins/GitLab), dan AWS Cloud Basics.",
+                insight: "💰 Revenue per user tertinggi (High Ticket). Target pasar korporat.",
+                revenue: "Rp 140.000.000"
+            },
+            {
+                id: 6,
+                title: "UI/UX Design Fundamentals",
+                icon: "fa-pen-nib",
+                price: "Rp 2.000.000",
+                participants: 97,
+                desc: "Memahami prinsip desain antarmuka dan pengalaman pengguna. Belajar menggunakan Figma, Wireframing, Prototyping, hingga Usability Testing.",
+                insight: "🎨 Konversi organik tinggi dari media sosial TikTok dan Instagram Reels.",
+                revenue: "Rp 194.000.000"
+            }
+        ];
+
+        const container = document.getElementById('coursesContainer');
+        const modal = document.getElementById('courseModal');
+
+        // Render Cards
+        coursesData.forEach(course => {
+            const cardHTML = `
+                <div class="course-card" onclick="openDetail(${course.id})">
+                    <div class="course-header">
+                        <i class="fab ${course.icon} course-icon"></i>
+                    </div>
+                    <div class="course-body">
+                        <h3>${course.title}</h3>
+                        <div class="course-stats">
+                            <div class="stat-item">
+                                <h4>${course.participants}</h4>
+                                <span>Peserta</span>
+                            </div>
+                            <div class="stat-item">
+                                <h4>${course.price}</h4>
+                                <span>Harga</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.innerHTML += cardHTML;
+        });
+
+        // Fungsi Buka Modal
+        function openDetail(id) {
+            const data = coursesData.find(c => c.id === id);
+            if(data) {
+                document.getElementById('modalTitle').innerText = data.title;
+                document.getElementById('modalPrice').innerText = data.price;
+                document.getElementById('modalParticipants').innerText = data.participants + " Orang";
+                document.getElementById('modalRevenue').innerText = data.revenue;
+                document.getElementById('modalDesc').innerText = data.desc;
+                document.getElementById('modalInsight').innerText = data.insight;
+                
+                // Update Icon Class
+                const iconElement = document.getElementById('modalIcon');
+                iconElement.className = `fab ${data.icon} modal-icon`;
+                // Reset style agar icon tetap di tengah (karena class modal-icon punya style flex sendiri)
+                iconElement.style.display = 'flex'; 
+
+                modal.classList.add('active');
+            }
+        }
+
+        // Fungsi Tutup Modal
+        function closeModal() {
+            modal.classList.remove('active');
+        }
+
+        // Tutup jika klik di luar area modal content
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>
+
+
+admin@svc.com
+
+asdasd123

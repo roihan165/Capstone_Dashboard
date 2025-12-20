@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Peserta - Flowcamp.id</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="container">
+        <!-- SIDEBAR (Sama dengan Dashboard) -->
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="image.png" alt="Flowcamp.id Logo" class="company-logo">
+            </div>
+            <ul class="menu">
+                <li><a href="dashboard.html"><i class="fas fa-th-large"></i> Dashboard Utama</a></li>
+                <li class="active"><a href="data_peserta.html"><i class="fas fa-user-graduate"></i> Data Peserta</a></li>
+                <li><a href="#"><i class="fas fa-wallet"></i> Keuangan</a></li>
+                <li><a href="#"><i class="fas fa-bullhorn"></i> Marketing (BI)</a></li>
+                <li><a href="#"><i class="fas fa-headset"></i> Layanan (ITIL 4)</a></li>
+            </ul>
+            <div class="logout">
+                <a href="#"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            <header>
+                <h1>Data Peserta Bootcamp</h1>
+                <div class="user-wrapper">
+                    <img src="image_ef7fc5.png" alt="Admin Profile" class="admin-photo">
+                    <div>
+                        <h4>Reza Hafiz</h4>
+                        <small>IT Operation Manager</small>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Tabel Data Peserta -->
+            <div class="card-table-container">
+                <div class="card-header">
+                    <h3><i class="fas fa-users"></i> List Seluruh Peserta (70 Data)</h3>
+                    <button class="btn-detail"><i class="fas fa-download"></i> Export CSV</button>
+                </div>
+                <div class="card-body table-scroll">
+                    <table width="100%" id="pesertaTable">
+                        <thead>
+                            <tr>
+                                <td>No</td>
+                                <td>Username</td>
+                                <td>Email</td>
+                                <td>Riwayat Courses</td>
+                                <td>Status</td>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <!-- Data Dummy akan di-generate di sini oleh JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Script Generate 70 Data Dummy -->
+    <script>
+        const firstNames = ["Aditya", "Budi", "Citra", "Dewi", "Eko", "Fajar", "Gita", "Hendra", "Indah", "Joko", "Kiki", "Lina", "Maya", "Nina", "Oscar", "Putri", "Qori", "Rina", "Sari", "Tono", "Umar", "Vina", "Wawan", "Xenia", "Yoga", "Zainal", "Rizky", "Sarah", "Dimas", "Ayu"];
+        const lastNames = ["Santoso", "Wijaya", "Saputra", "Utami", "Pratama", "Nugroho", "Hidayat", "Kusuma", "Lestari", "Ramadhan", "Pertiwi", "Gunawan", "Setiawan", "Siregar", "Nasution", "Wibowo", "Yuliana", "Hartono", "Firmansyah", "Anwar"];
+        const coursesList = [
+            "Fullstack Javascript", 
+            "Python Data Science", 
+            "Golang Backend", 
+            "Flutter Mobile Dev", 
+            "DevOps Engineering", 
+            "UI/UX Design Fundamentals",
+            "React Native Masterclass"
+        ];
+        const domains = ["gmail.com", "yahoo.com", "outlook.com", "flowcamp.student.id"];
+
+        function getRandomItem(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function generateRandomCourses() {
+            // User bisa ikut 1 sampai 3 course
+            const numCourses = Math.floor(Math.random() * 3) + 1;
+            const myCourses = new Set();
+            while(myCourses.size < numCourses) {
+                myCourses.add(getRandomItem(coursesList));
+            }
+            return Array.from(myCourses);
+        }
+
+        const tableBody = document.getElementById('tableBody');
+        let htmlContent = "";
+
+        // Generate 70 Data
+        for (let i = 1; i <= 70; i++) {
+            const fName = getRandomItem(firstNames);
+            const lName = getRandomItem(lastNames);
+            const username = `${fName.toLowerCase()}_${lName.toLowerCase()}${Math.floor(Math.random()*100)}`;
+            const email = `${fName.toLowerCase()}.${lName.toLowerCase()}@${getRandomItem(domains)}`;
+            const courses = generateRandomCourses();
+            
+            // Badge warna untuk course
+            let courseBadges = courses.map(c => `<span class="course-badge">${c}</span>`).join(" ");
+
+            htmlContent += `
+                <tr>
+                    <td>${i}</td>
+                    <td>
+                        <div class="user-info">
+                            <div class="user-avatar">${fName.charAt(0)}${lName.charAt(0)}</div>
+                            <span>${username}</span>
+                        </div>
+                    </td>
+                    <td>${email}</td>
+                    <td>${courseBadges}</td>
+                    <td><span class="status success">Aktif</span></td>
+                </tr>
+            `;
+        }
+
+        tableBody.innerHTML = htmlContent;
+    </script>
+</body>
+</html>
