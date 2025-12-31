@@ -12,6 +12,7 @@ import streamlit.components.v1 as components
 import numpy as np
 from sentence_transformers import SentenceTransformer, util
 import re
+import bcrypt
 
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Table, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
@@ -19,7 +20,58 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import cm
 
 
+
+# =============================
+# USER DATABASE (ROLE-BASED)
+# =============================
+USERS = {
+    "admin": {
+        "password": b"$2b$12$/FeSxkEROMGfYzyqrhQ0wOufha25HsKZI29AJjI.i.KkklrSEX9IO",  # hashed 'adminpass'
+        "role": "admin"
+    }
+}
+
+def check_password(username, password):
+    if username not in USERS:
+        return False
+    return bcrypt.checkpw(
+        password.encode(),
+        USERS[username]["password"]
+    )
+
+
+def login():
+    st.title("🔐 Admin Login")
+
+    username = st.text_input("Username")
+    password = st.text_input("Password", type="password")
+
+    if st.button("Login"):
+        if check_password(username, password):
+            st.session_state["logged_in"] = True
+            st.session_state["username"] = username
+            st.session_state["role"] = USERS[username]["role"]
+            st.success("Login berhasil")
+            st.rerun()
+        else:
+            st.error("Username atau password salah")
+
+
 st.set_page_config(page_title="Dashboard Penjualan", layout="wide")
+
+if "logged_in" not in st.session_state:
+    st.session_state["logged_in"] = False
+
+if not st.session_state["logged_in"]:
+    login()
+    st.stop()
+
+# Role-based access
+if st.session_state.get("role") != "admin":
+    st.error("❌ Anda tidak memiliki akses ke dashboard ini.")
+    st.stop()
+
+
 
 # ----------------- Google Sheets Config -----------------
 spreadsheet_id = "1Cuyksq2t1xiYeokaQ5J_WGTezqMa-1TR"
@@ -32,6 +84,14 @@ SHEETS = {
     "Course": "709240030",
     "Webinar": "1395015593"
 }
+
+st.sidebar.markdown("---")
+st.sidebar.write(f"👤 Login sebagai: **{st.session_state['username']}**")
+
+if st.sidebar.button("🚪 Logout"):
+    st.session_state.clear()
+    st.rerun()
+
 
 st.sidebar.markdown("---")
 st.sidebar.subheader("Sumber Data")
@@ -414,31 +474,31 @@ col1,col2,col3,col4,col5 = st.columns(5)
 
 col1.markdown(
     f'<div class="kpi-card"><div class="kpi-value">Rp {total_revenue:,.0f}</div>'
-    '<div class="kpi-label">Total Pemasukan (SUCCESS)</div></div>',
+    '<div class="kpi-label">~~Total Pemasukan (SUCCESS)</div></div>',
     unsafe_allow_html=True
 )
 
 col2.markdown(
     f'<div class="kpi-card"><div class="kpi-value">{total_transactions}</div>'
-    '<div class="kpi-label">Total Transaksi</div></div>',
+    '<div class="kpi-label">~~Total Transaksi</div></div>',
     unsafe_allow_html=True
 )
 
 col3.markdown(
     f'<div class="kpi-card"><div class="kpi-value">{success_rate:.1f}%</div>'
-    '<div class="kpi-label">Success Ratio</div></div>',
+    '<div class="kpi-label">~~Success Ratio</div></div>',
     unsafe_allow_html=True
 )
 
 col4.markdown(
     f'<div class="kpi-card"><div class="kpi-value">Rp {cancelled_value:,.0f}</div>'
-    '<div class="kpi-label">Cancelled Value</div></div>',
+    '<div class="kpi-label">~~Cancelled Value</div></div>',
     unsafe_allow_html=True
 )
 
 col5.markdown(
     f'<div class="kpi-card"><div class="kpi-value">{top_product_name}</div>'
-    '<div class="kpi-label">Top Product</div></div>',
+    '<div class="kpi-label">~~Top Product</div></div>',
     unsafe_allow_html=True
 )
 
@@ -571,6 +631,21 @@ if menu == "Dashboard Utama":
         title="Cancelled by Month"
     )
     c3.plotly_chart(fig_cm, use_container_width=True)
+
+    # ----------------- Pie chart of participation per product (small card) -----------------
+    if 'Judul Barang' in filtered.columns and 'qty' in filtered.columns:
+        st.markdown('---')
+        st.markdown('<div class="chart-card"><h4>Bagikan Partisipasi per Produk</h4>', unsafe_allow_html=True)
+        participation_by_judul = filtered.groupby('Judul Barang')['qty'].sum().reset_index()
+        participation_by_judul = participation_by_judul.sort_values('qty', ascending=False)
+        if participation_by_judul.empty:
+            st.info("Tidak ada data partisipasi.")
+        else:
+            fig_pie = px.pie(participation_by_judul, values='qty', names='Judul Barang', title='Partisipasi per Judul Barang')
+            fig_pie.update_traces(textposition='inside', textinfo='percent')
+            st.plotly_chart(fig_pie, width='stretch')
+        st.markdown('</div>', unsafe_allow_html=True)
+
 
 
     with right:
@@ -783,23 +858,6 @@ elif menu == "Layanan":
         use_container_width=True,
         height=250
     )
-
-
-
-# ----------------- Pie chart of participation per product (small card) -----------------
-if 'Judul Barang' in filtered.columns and 'qty' in filtered.columns:
-    st.markdown('---')
-    st.markdown('<div class="chart-card"><h4>Bagikan Partisipasi per Produk</h4>', unsafe_allow_html=True)
-    participation_by_judul = filtered.groupby('Judul Barang')['qty'].sum().reset_index()
-    participation_by_judul = participation_by_judul.sort_values('qty', ascending=False)
-    if participation_by_judul.empty:
-        st.info("Tidak ada data partisipasi.")
-    else:
-        fig_pie = px.pie(participation_by_judul, values='qty', names='Judul Barang', title='Partisipasi per Judul Barang')
-        fig_pie.update_traces(textposition='inside', textinfo='percent+label')
-        st.plotly_chart(fig_pie, width='stretch')
-    st.markdown('</div>', unsafe_allow_html=True)
-
 
 # ----------------- Export utilities -----------------
 @st.cache_data
